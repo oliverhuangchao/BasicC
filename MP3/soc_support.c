@@ -167,7 +167,7 @@ void soc_get_socket_id(socket_t *new)
     char line[MAXLINE];
     assert(new != NULL);
 
-    printf("Socket ID:");
+//    printf("Socket ID:");
     fgets(line, MAXLINE, stdin);
     sscanf(line, "%d", &new->socket_id);
 
@@ -202,7 +202,7 @@ socket_t *soc_unsorted_replace(list_t *list_ptr, socket_t *socket, int pos_index
     return rec_ptr;
 }
 
-void soc_sort(list_t *list_ptr, int sort_type)
+void soc_sort(list_t **list_ptr, int sort_type)
 {
     list_sort(list_ptr, sort_type);
 }
@@ -218,7 +218,7 @@ void soc_sort(list_t *list_ptr, int sort_type)
  */
 void soc_fill_record(socket_t *new)
 {
-    char line[MAXLINE];
+/*    char line[MAXLINE];
     assert(new != NULL);
 
     printf("Dest IP address:");
@@ -248,7 +248,7 @@ void soc_fill_record(socket_t *new)
     printf("Time received (int):");
     fgets(line, MAXLINE, stdin);
     sscanf(line, "%d", &new->time_received);
-    printf("\n");
+    printf("\n");*/
 }
 
 /* print the information for a particular Socket record 

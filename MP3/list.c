@@ -61,7 +61,7 @@ data_t * list_access(list_t *list_ptr, int pos_index)
 
 	
     // debugging function to verify that the structure of the list is valid
-    list_debug_validate(list_ptr);
+    //list_debug_validate(list_ptr);
 
     /* handle special cases.
      *   1.  The list is empty
@@ -112,7 +112,7 @@ list_t * list_construct(void)
     L->ll_tail = NULL;
     L->ll_entries = 0;
     L->ll_sorted_state = LIST_SORTED;
-    list_debug_validate(L);
+    //list_debug_validate(L);
     return L;
 }
 
@@ -137,7 +137,7 @@ list_t * list_construct(void)
  */
 data_t * list_elem_find(list_t *list_ptr, data_t *elem_ptr, int *pos_index)
 {
-    list_debug_validate(list_ptr);
+    //list_debug_validate(list_ptr);
 
 	list_node_t *L = list_ptr -> ll_head;
     *pos_index = 0;
@@ -155,7 +155,7 @@ data_t * list_elem_find(list_t *list_ptr, data_t *elem_ptr, int *pos_index)
  */
 void list_destruct(list_t *list_ptr)
 {
-    list_debug_validate(list_ptr);
+    //list_debug_validate(list_ptr);
     list_node_t *N;
 
     /*
@@ -261,7 +261,7 @@ void list_insert(list_t *list_ptr, data_t *elem_ptr, int pos_index)
     /* the last three lines of this function must be the following */
     if (list_ptr->ll_sorted_state == LIST_SORTED) 
         list_ptr->ll_sorted_state = LIST_UNSORTED;
-    list_debug_validate(list_ptr);
+    //list_debug_validate(list_ptr);
 }
 
 /* Inserts the element into the specified sorted list at the proper position,
@@ -334,7 +334,7 @@ void list_insert_sorted(list_t *list_ptr, data_t *elem_ptr)
     }
     (list_ptr->ll_entries)++;
     /* the last line checks if the new list is correct */
-    list_debug_validate(list_ptr);
+    //list_debug_validate(list_ptr);
 }
 
 /* Removes an element from the specified list, at the specified list position,
@@ -398,7 +398,7 @@ data_t *list_remove(list_t *list_ptr, int pos_index)
     }
     free(N);
     (list_ptr->ll_entries)--;
-    list_debug_validate(list_ptr);
+    //list_debug_validate(list_ptr);
     return D;
 
 }
@@ -425,21 +425,19 @@ void Insertion_sort(list_t *list_ptr)
 {
     list_t *new_list = NULL;
     new_list = list_construct();
-    list_node_t *N ;
-    N = list_ptr -> ll_head;
     data_t *D;
-
-    while(N != NULL){
-        D = list_remove(list_ptr,N) ;
+    int i = list_ptr -> ll_entries;
+    while(i != 0){
+        D = list_remove(list_ptr, 0) ;
         list_insert_sorted(new_list,D);
-        N = list_ptr -> ll_head;
+        i--;
     }
     list_ptr -> ll_head = new_list -> ll_head;
     list_ptr -> ll_tail = new_list -> ll_tail;
     list_ptr -> ll_entries = new_list -> ll_entries;
     new_list -> ll_head = NULL;
     new_list -> ll_tail = NULL;
-    new_list -> ll_entries = NULL;
+    new_list -> ll_entries = 0;
     free(new_list);
 }
 
@@ -495,7 +493,9 @@ void SelectionSort_I(list_t *A, list_node_t *m, list_node_t *n)
     }
 return;
 }
-
+/*---------------------------*/
+/*--------- merge sort ------*/
+/*--------------------------*/
 list_t *MergSort(list_t *list_ptr)
 {
     if(list_ptr -> ll_entries <= 1)
@@ -522,40 +522,36 @@ list_t *Merg(list_t *L, list_t *R)
 {
     list_t *new_list;
     new_list = list_construct();
-    list_node_t *M;
-    list_node_t *N;
-    list_node_t *temp;
-    
-    M = L -> ll_head;
-    N = R -> ll_head;
-    while(N != NULL && M != NULL){
-        if(comp_proc(M -> data_ptr, N -> data_ptr) >= 0){
-            temp = M -> ll_next;
-            list_insert(new_list,list_remove(L,M) , NULL);
-            M = temp;
+    //int pos_index = 0;
+/*    int leftPos = 0;
+    int rightPos = 0;*/
+    while(list_entries(L)!=0 && list_entries(R)!=0){
+        if(comp_proc(list_access(L,0), list_access(R,0)) >= 0){
+            list_insert(new_list,list_remove(L,0) , LISTPOS_TAIL);
+
+            //list_insert(new_list,list_access(L,leftPos) , LISTPOS_TAIL);
+            //leftPos ++;
         }
         else{
-            temp = N -> ll_next;
-            list_insert(new_list,list_remove(R,N),NULL);
-            N = temp;
+            list_insert(new_list,list_remove(R,0),LISTPOS_TAIL);
+          //list_insert(new_list,list_access(R,rightPos),LISTPOS_TAIL);
+            //rightPos ++;
         }
     }
 
-    if (M == NULL)
+    if (list_entries(L) == 0)
     {
-        while(N != NULL){
-            temp = N -> ll_next;
-            list_insert(new_list, list_remove(R,N),NULL);
-            N = temp;
+        while(list_entries(R) != 0){
+            list_insert(new_list, list_remove(R, 0), LISTPOS_TAIL);
         }
     }
-    else{
-        while(M != NULL){
-            temp = M -> ll_next;
-            list_insert(new_list, list_remove(L,M) , NULL);
-            M = temp;
+    else// if(list_entries(R) == 0)
+    {
+        while(list_entries(L) != 0){
+            list_insert(new_list, list_remove(L,0) , LISTPOS_TAIL);
         }
     }
+
     assert (L -> ll_entries == 0 && R -> ll_entries == 0);
     free(L);
     free(R);
@@ -563,13 +559,80 @@ list_t *Merg(list_t *L, list_t *R)
 
 }
 
-// void qsort
+
+/*void myqsort(data_t ** list_ptr)
+{
+    int i;
+    int Asize = list_entries(list_ptr);
+
+    int j_a = 0;
+    int j_b = 0;
+    data_t* pivot = list_remove(list_ptr,0.5*Asize);
+
+    data_t ** QsortA = (data_t **) malloc(Asize*sizeof(data_t *));
+    data_t ** QsortB = (data_t **) malloc(Asize*sizeof(data_t *));
+
+    for (i = 0; i < Asize; i++) 
+    {
+        if (comp_proc(pivot,list_access(list_ptr,i))>0)
+        {
+            QsortA[i] = list_remove(list_ptr, LISTPOS_HEAD);
+            j_a++;
+        }
+        else
+        {
+            QsortB[i] = list_remove(list_ptr, LISTPOS_HEAD);
+            j_b++;
+        }
+    }
+
+    qsort(QsortA);
+    qsort(QsortB);
+
+    for (i = 0; i < Asize; i++) 
+    {
+        list_insert(list_ptr, QsortA[i], LISTPOS_TAIL);
+    }
+
+    list_insert(list_ptr, pivot, LISTPOS_TAIL);
+    
+    for (i = 0; i < Asize; i++) 
+    {
+        list_insert(list_ptr, QsortB[i], LISTPOS_TAIL);
+    }
+
+    free(QsortA);
+    free(QsortB);
+
+}*/
 
 
+int my_compare(const void *p_a, const void *p_b)
+{
+    return comp_proc(*(data_t **) p_b, *(data_t **) p_a);
+}
 
+/* Comparison function for qsort */
 
+list_t * myqsort(list_t * list_ptr)
+{
+    int i, Asize = list_entries(list_ptr);
+    data_t ** QsortA = (data_t **) malloc(Asize*sizeof(data_t *));
 
-
+    for (i = 0; i < Asize; i++)
+    {
+        QsortA[i] = list_remove(list_ptr, 0);//LISTPOS_HEAD
+    }
+    
+    qsort(QsortA, Asize, sizeof(data_t *), my_compare);
+    
+    for (i = 0; i < Asize; i++)
+    {
+        list_insert(list_ptr, QsortA[i], LISTPOS_TAIL);
+    }
+    free(QsortA);
+    return list_ptr;
+}
 
 
 
@@ -583,10 +646,11 @@ void list_sort(list_t **list_ptr, int sort_type){
         SelectionSort_R(*list_ptr,(*list_ptr) -> ll_head, (*list_ptr) -> ll_tail);
     else if(sort_type == 4)
         *list_ptr = MergSort(*list_ptr);
-    // else if(sort_type == 5)
+    else if(sort_type == 5)
+        *list_ptr = myqsort(*list_ptr);
 
     (*list_ptr) -> ll_sorted_state = LIST_SORTED;
-    list_debug_validate(* list_ptr);
+    //list_debug_validate(* list_ptr);
     return;
 
 

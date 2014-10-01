@@ -34,6 +34,7 @@ int main(int argc, char *argv[])
     int addr_range;
     int soc_id;
 
+    //printf("aaa");
     if (argc != 3) {
         printf("Usage: ./geninput listsize listype\n");
         printf("\tlistsize: number of records to create\n");
@@ -46,7 +47,7 @@ int main(int argc, char *argv[])
         exit(2);
     }
     list_type = atoi(argv[2]);
-    addr_range = records * 0.75;
+    addr_range = records * 75;
     srand48(22);
 
     int i;
@@ -56,7 +57,9 @@ int main(int argc, char *argv[])
             soc_id = (int) (addr_range * drand48()) + 1;
             printf("pushback\n%d\n", soc_id);
         }
+       // printf("print\n");
         printf("sort\n");
+        //printf("print\n");
         printf("quit\n");
     }
     else if (list_type == 2) {

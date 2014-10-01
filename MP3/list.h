@@ -34,6 +34,7 @@ void     list_insert(list_t *list_ptr, data_t *elem_ptr, int pos_index);
 void     list_insert_sorted(list_t *list_ptr, data_t *elem_ptr);
 data_t * list_remove(list_t *list_ptr, int pos_index);
 int      comp_proc(data_t *, data_t *);
+void 	 list_sort(list_t **, int);
 
 /* commands specified to vim. ts: tabstop, sts: soft tabstop sw: shiftwidth */
 /* vi:set ts=8 sts=4 sw=4 et: */
